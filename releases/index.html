@@ -78,7 +78,7 @@
                     .then(data => {
                         data.assets.forEach(asset => {
                             const downloadButton = document.createElement('a');
-                            downloadButton.href = `./download/?downloadLink=${encodeURIComponent(asset.browser_download_url)}`;
+                            downloadButton.href = `./download.html/?downloadLink=${encodeURIComponent(asset.browser_download_url)}`;
                             //downloadButton.href = `./download/?downloadLink=${encodeURIComponent(`./download/?downloadLink=${encodeURIComponent(asset.browser_download_url)}`)}`; // 2 redirects ?!
 
                             if (asset.name == "dev_env.zip") {
