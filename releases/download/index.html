@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download</title>
+    <style>
+        .downloadButton {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .downloadButton:hover {
+            background-color: #45a049;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        * {
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generating Link...</h1>
+    <p id="waitMessage">Please wait...</p>
+    <a id="downloadLink" class="downloadButton hidden" href="#">Download Now</a>
+
+    <script>
+        // Function to parse query parameters from URL
+        function getQueryParams() {
+            const queryParams = {};
+            const queryString = window.location.search.substring(1);
+            const pairs = queryString.split('&');
+            pairs.forEach(pair => {
+                const keyValue = pair.split('=');
+                queryParams[keyValue[0]] = keyValue[1];
+            });
+            return queryParams;
+        }
+
+        // Extract download link from URL parameters
+        const { downloadLink } = getQueryParams();
+
+        let countdown = 5; // Time to wait in seconds
+        const waitMessage = document.getElementById('waitMessage');
+        const downloadButton = document.getElementById('downloadLink');
+
+        waitMessage.textContent = `Please wait ${countdown} second${countdown !== 1 ? 's' : ''}...`;
+
+        // Countdown timer
+        const timerInterval = setInterval(() => {
+            countdown--;
+
+            waitMessage.textContent = `Please wait ${countdown} second${countdown !== 1 ? 's' : ''}...`;
+            
+            if (countdown <= 0) {
+                clearInterval(timerInterval);
+                downloadButton.href = decodeURIComponent(downloadLink);
+                downloadButton.textContent = 'Download Now';
+                downloadButton.classList.remove('hidden');
+                waitMessage.textContent = ''; // Clear the wait message
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
