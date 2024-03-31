@@ -66,7 +66,7 @@
             
             if (countdown <= 0) {
                 clearInterval(timerInterval);
-                downloadButton.href = decodeURIComponent(downloadLink);
+                downloadButton.href = decodeURIComponent(atob(downloadLink));
                 downloadButton.textContent = 'Download Now';
                 downloadButton.classList.remove('hidden');
                 waitMessage.textContent = ''; // Clear the wait message
