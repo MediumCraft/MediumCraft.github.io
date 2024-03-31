@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title id="title-title">GitHub Release Downloader</title>
+        <style>
+            .downloadButton {
+                display: block;
+                margin-bottom: 10px;
+                padding: 10px 20px;
+                background-color: #4CAF50;
+                color: white;
+                text-decoration: none;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            .downloadButton:hover {
+                background-color: #45a049;
+            }
+
+            .fileSize {
+                margin-left: 10px;
+            }
+
+            .error {
+                color: red;
+                font-weight: bold;
+            }
+
+            * {
+                font-family: sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id="title-h1">GitHub Release Downloader</h1>
+        <div id="downloadButtons"></div>
+        <div id="errorContainer" class="error"></div>
+
+        <script>
+            // Function to parse query parameters from URL
+            function getQueryParams() {
+                const queryParams = {};
+                const queryString = window.location.search.substring(1);
+                const pairs = queryString.split('&');
+                pairs.forEach(pair => {
+                    const keyValue = pair.split('=');
+                    queryParams[keyValue[0]] = keyValue[1];
+                });
+                return queryParams;
+            }
+
+            // Function to fetch the latest release information from GitHub
+            function fetchLatestRelease(owner, repository) {
+                return fetch(`https://api.github.com/repos/${owner}/${repository}/releases/latest`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch release (${response.status} ${response.statusText})`);
+                        }
+                        return response.json();
+                    });
+            }
+
+            // Function to create download buttons for assets in the latest release
+            function createDownloadButtons(owner, repository) {
+                const downloadButtonsContainer = document.getElementById('downloadButtons');
+
+                const h1Title = document.getElementById("title-h1");
+                h1Title.textContent = `${owner}/${repository} Downloads`;
+                const title = document.getElementById("title-title");
+                title.textContent = `${owner}/${repository} Downloads`;
+                
+                fetchLatestRelease(owner, repository)
+                    .then(data => {
+                        data.assets.forEach(asset => {
+                            const downloadButton = document.createElement('a');
+                            downloadButton.href = asset.browser_download_url;
+                            
+                            if (asset.name == "dev_env.zip") {
+                                asset.name = "Developer Environment"
+                            }
+
+                            const fileSize = (asset.size / (1024 * 1024)).toFixed(2) + ' MB';
+                            downloadButton.textContent = `Download ${asset.name} (${fileSize})`;
+                            downloadButton.download = asset.name;
+                            downloadButton.classList.add('downloadButton');
+
+                            
+                            //const fileSizeSpan = document.createElement('span');
+                            //fileSizeSpan.classList.add('fileSize');
+                            //fileSizeSpan.textContent = `(${fileSize})`;
+
+                            downloadButtonsContainer.appendChild(downloadButton);
+                            //downloadButtonsContainer.appendChild(fileSizeSpan);
+                            downloadButtonsContainer.appendChild(document.createElement('br'));
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching release:', error);
+                        document.getElementById('errorContainer').textContent = `Error: ${error.message}`;
+                    });
+            }
+
+            // Extract owner and repository from URL parameters and create download buttons
+            const { owner, repository } = getQueryParams();
+            if (owner && repository) {
+                createDownloadButtons(owner, repository);
+            } else {
+                document.getElementById('errorContainer').textContent = 'Error: Owner and repository not provided in URL.';
+            }
+        </script>
+    </body>
+</html>
