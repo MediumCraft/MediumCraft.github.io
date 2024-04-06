@@ -22,6 +22,11 @@
             background-color: #45a049;
         }
 
+        .downloadButton[disabled] {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
         .hidden {
             display: none;
         }
@@ -34,9 +39,11 @@
 <body>
     <h1>Generating Link...</h1>
     <p id="waitMessage">Please wait...</p>
-    <a id="downloadLink" class="downloadButton hidden" href="#">Download Now</a>
+    <a id="downloadLink" class="downloadButton">Download Now</a>
 
     <script>
+        let redirectUrl;
+
         // Function to parse query parameters from URL
         function getQueryParams() {
             const queryParams = {};
@@ -49,27 +56,64 @@
             return queryParams;
         }
 
+        function redirect() {
+            if (redirectUrl == null || redirectUrl == "") {
+                return;
+            }
+
+            window.open(redirectUrl, "_blank");
+        }
+
+        function isValidBase64(str) {
+            try {
+                // Attempt to decode the string
+                const decodedString = atob(str);
+                
+                // Verify if the decoded string can be encoded back to the original string
+                return btoa(decodedString) === str;
+            } catch (error) {
+                // If an error occurs during decoding, the string is not valid Base64
+                return false;
+            }
+        }
+
         // Extract download link from URL parameters
         const { downloadLink } = getQueryParams();
 
         let countdown = 5; // Time to wait in seconds
         const waitMessage = document.getElementById('waitMessage');
         const downloadButton = document.getElementById('downloadLink');
+        downloadButton.setAttribute("disabled", "");
 
         waitMessage.textContent = `Please wait ${countdown} second${countdown !== 1 ? 's' : ''}...`;
 
         // Countdown timer
         const timerInterval = setInterval(() => {
+            
+
             countdown--;
 
             waitMessage.textContent = `Please wait ${countdown} second${countdown !== 1 ? 's' : ''}...`;
             
             if (countdown <= 0) {
                 clearInterval(timerInterval);
-                downloadButton.href = decodeURIComponent(atob(downloadLink));
-                downloadButton.textContent = 'Download Now';
-                downloadButton.classList.remove('hidden');
-                waitMessage.textContent = ''; // Clear the wait message
+
+                if (isValidBase64(downloadLink)) {
+                    redirectUrl = decodeURIComponent(atob(downloadLink));
+                }
+                else {
+                    redirectUrl = downloadLink;
+                }
+                
+                //downloadButton.textContent = 'Download Now';
+                //downloadButton.classList.remove('hidden');
+                downloadButton.removeAttribute("disabled");
+                waitMessage.textContent = 'Click the button below to continue';
+                
+                if (downloadButton.addEventListener)
+                    downloadButton.addEventListener("click", redirect, false);
+                else if (downloadButton.attachEvent)
+                    downloadButton.attachEvent('onclick', redirect);
             }
         }, 1000);
     </script>
