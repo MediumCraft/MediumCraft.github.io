@@ -98,12 +98,14 @@
             if (countdown <= 0) {
                 clearInterval(timerInterval);
 
-                if (isValidBase64(downloadLink)) {
-                    redirectUrl = decodeURIComponent(atob(downloadLink));
-                }
-                else {
-                    redirectUrl = downloadLink;
-                }
+                //if (isValidBase64(downloadLink)) {
+                //    redirectUrl = decodeURIComponent(atob(downloadLink));
+                //}
+                //else {
+                //    redirectUrl = downloadLink;
+                //}
+
+                redirectUrl = decodeURIComponent(atob(downloadLink));
                 
                 //downloadButton.textContent = 'Download Now';
                 //downloadButton.classList.remove('hidden');
